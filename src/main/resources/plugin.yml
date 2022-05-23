@@ -1,0 +1,4 @@
+name: F5ArmorStand
+version: '${project.version}'
+main: teamuni.net.f5armorstand.F5ArmorStand
+api-version: 1.18
