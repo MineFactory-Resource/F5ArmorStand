@@ -1,47 +1,86 @@
 package teamuni.net.f5armorstand;
 
+
+
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.Vector3f;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EnumItemSlot;
 import net.minecraft.world.entity.decoration.EntityArmorStand;
+import net.minecraft.world.item.Items;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public final class F5ArmorStand extends JavaPlugin implements Listener {
-    private List<EntityArmorStand> armorStands = new ArrayList<>();
+    Map<UUID, EntityArmorStand> armorStands = new HashMap<>(); //아머스탠드 맵
 
     @Override
     public void onEnable() {
-        Bukkit.getLogger().info("F5ArmorStand Enable. made by fade"); /* 플러그인 켜질때 실행되는 문구 */
-        Bukkit.getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(this, this); //이벤트 리스너 등록
+        Bukkit.getOnlinePlayers().forEach(player -> {createArmorStand(player);updateArmorStand(player);});
     }
-
-    @EventHandler
-    public void ArmorStandView(PlayerMoveEvent e) {
-            for (final Player p : Bukkit.getServer().getOnlinePlayers()) {
-                Location loc = p.getLocation();
-                ArmorStand as = p.getWorld().spawn(loc, ArmorStand.class);
-                as.setGravity(false);
-                as.setVisible(false);
-                as.setCustomNameVisible(false);
-                as.getEquipment().setHelmet(new ItemStack(Material.GHAST_TEAR));
-                as.teleport(loc.add(0, 1, 0));
-                as.remove();
-            }
-        }
-
-
 
     @Override
     public void onDisable() {
-        Bukkit.getLogger().info("F5ArmorStand Enable. made by fade"); /* 플러그인이 꺼질때 실행되는 문구 */
+        Bukkit.getOnlinePlayers().forEach(player -> { //서버 리로드시 아머스탠드가 남아있어 아머스탠드가 2개이상 생기는것을 방지하기위해 기존 아머스탠드 제거
+            armorStands.computeIfPresent(player.getUniqueId(), (k, v) -> {
+                ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityDestroy(v.ae()));
+                return null;
+            });
+        });
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) { //플레이어 접속시 아머스탠드를 만들고 업데이트함.
+        createArmorStand(event.getPlayer());
+        updateArmorStand(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onChangeDimension(PlayerChangedWorldEvent event) { //차원(지옥문을 통해 네더 월드로 가거나, 엔드 차원문을 통해 엔드 월드를 가거나 등.) 이동시 아머스탠드를 만들고 업데이트를함.
+        createArmorStand(event.getPlayer());
+        updateArmorStand(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) { //플레이어 이동시
+        updateArmorStand(event.getPlayer());
+    } //플레이어가 움직일때 아머스탠드 업데이트.
+
+    private void createArmorStand(Player player) {
+        EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle()); //새로운 아머스탠드 생성
+        armorStand.j(true); //투명하게 설정
+        armorStand.t(true); //히트박스 제거
+        armorStands.put(player.getUniqueId(),armorStand);
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutSpawnEntity(armorStand));
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityEquipment(armorStand.ae(), Collections.singletonList(new Pair<>(EnumItemSlot.f, Items.pC.P_()))));
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false));
+    }
+
+    private void updateArmorStand(Player player) {
+        EntityArmorStand armorStand = armorStands.get(player.getUniqueId());
+        if (armorStand == null) return;
+        Location loc = player.getLocation();
+        armorStand.a(loc.getX(), loc.getY(), loc.getZ());
+        armorStand.o(loc.getYaw());
+        armorStand.p(loc.getPitch());
+        armorStand.a(new Vector3f(player.getLocation().getPitch(), 0, 0));
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false));
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityTeleport(armorStand));
     }
 }
