@@ -32,7 +32,10 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this); //이벤트 리스너 등록
-        Bukkit.getOnlinePlayers().forEach(player -> {createArmorStand(player);updateArmorStand(player);});
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            createArmorStand(player);
+            updateArmorStand(player);
+        });
     }
 
     @Override
@@ -66,7 +69,7 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
         EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle()); //새로운 아머스탠드 생성
         armorStand.j(true); //투명하게 설정
         armorStand.t(true); //히트박스 제거
-        armorStands.put(player.getUniqueId(),armorStand);
+        armorStands.put(player.getUniqueId(), armorStand);
         ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutSpawnEntity(armorStand));
         ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityEquipment(armorStand.ae(), Collections.singletonList(new Pair<>(EnumItemSlot.f, Items.pC.P_()))));
         ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false));
