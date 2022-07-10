@@ -35,8 +35,8 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
                 if (!player.hasPermission("armorstand.noshow")) {
                     createArmorStand(player);
                     updateArmorStand(player);
-            }
-        });
+                }
+            });
     }
     @Override
     public void onDisable() {
@@ -81,24 +81,24 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
 
 
     private void createArmorStand(Player player) {
-            EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle()); //새로운 아머스탠드 생성
-            armorStand.j(true); //투명하게 설정
-            armorStand.t(true); //히트박스 제거
-            armorStands.put(player.getUniqueId(), armorStand);
-            ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutSpawnEntity(armorStand));
-            ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityEquipment(armorStand.ae(), Collections.singletonList(new Pair<>(EnumItemSlot.f, Items.pC.P_()))));
-            ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false));
-        }
+        EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle()); //새로운 아머스탠드 생성
+        armorStand.j(true); //투명하게 설정
+        armorStand.t(true); //히트박스 제거
+        armorStands.put(player.getUniqueId(), armorStand);
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutSpawnEntity(armorStand));
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityEquipment(armorStand.ae(), Collections.singletonList(new Pair<>(EnumItemSlot.f, Items.pC.P_()))));
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false));
+    }
 
     private void updateArmorStand(Player player) {
-            EntityArmorStand armorStand = armorStands.get(player.getUniqueId());
-            if (armorStand == null) return;
-            Location loc = player.getLocation();
-            armorStand.a(loc.getX(), loc.getY(), loc.getZ());
-            armorStand.o(loc.getYaw());
-            armorStand.p(loc.getPitch());
-            armorStand.a(new Vector3f(player.getLocation().getPitch(), 0, 0));
-            ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false));
-            ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityTeleport(armorStand));
-        }
+        EntityArmorStand armorStand = armorStands.get(player.getUniqueId());
+        if (armorStand == null) return;
+        Location loc = player.getLocation();
+        armorStand.a(loc.getX(), loc.getY(), loc.getZ());
+        armorStand.o(loc.getYaw());
+        armorStand.p(loc.getPitch());
+        armorStand.a(new Vector3f(player.getLocation().getPitch(), 0, 0));
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false));
+        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityTeleport(armorStand));
+    }
 }
