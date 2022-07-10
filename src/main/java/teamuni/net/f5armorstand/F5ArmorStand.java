@@ -31,12 +31,12 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this); //이벤트 리스너 등록
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                if (!player.hasPermission("armorstand.noshow")) {
-                    createArmorStand(player);
-                    updateArmorStand(player);
-                }
-            });
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            if (!player.hasPermission("armorstand.noshow")) {
+                createArmorStand(player);
+                updateArmorStand(player);
+            }
+        });
     }
     @Override
     public void onDisable() {
