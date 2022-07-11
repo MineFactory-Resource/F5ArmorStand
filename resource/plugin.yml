@@ -1,0 +1,7 @@
+name: F5ArmorStand
+version: 0.0.1
+main: teamuni.net.f5armorstand.F5ArmorStand
+permissions:
+  armorstand.noshow:
+    description: 해당 권한이 있으면 아머스탠드가 권한을 가진 유저를 따라다니지 않습니다.
+    default: op
