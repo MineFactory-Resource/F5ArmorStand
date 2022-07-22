@@ -74,7 +74,6 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (!player.hasPermission("armorstand.noshow")) { //플레이어 이동시
-            createArmorStand(event.getPlayer());
             updateArmorStand(event.getPlayer()); //플레이어가 움직일때 아머스탠드 업데이트.
         }
     }
