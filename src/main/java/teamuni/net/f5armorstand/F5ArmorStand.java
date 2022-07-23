@@ -18,12 +18,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
 
 public final class F5ArmorStand extends JavaPlugin implements Listener {
     Map<UUID, EntityArmorStand> armorStands = new HashMap<>(); //아머스탠드 맵
@@ -69,6 +68,16 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
         }
     }
 
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event) {
+        if (event.getTo() == null) return;
+        if (event.getFrom().getWorld() == null) return;
+        if (event.getFrom().getWorld().equals(event.getTo().getWorld())) return;
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+            createArmorStand(event.getPlayer());
+            updateArmorStand(event.getPlayer());
+        });
+    }
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
@@ -81,6 +90,8 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
 
     private void createArmorStand(Player player) {
         EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle()); //새로운 아머스탠드 생성
+        Location loc = player.getLocation();
+        armorStand.a(loc.getX(), loc.getY(), loc.getZ());
         armorStand.j(true); //투명하게 설정
         armorStand.t(true); //히트박스 제거
         armorStands.put(player.getUniqueId(), armorStand);
