@@ -70,6 +70,7 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
+        if (!event.getPlayer().hasPermission("armorstand.noshow")) return;
         if (event.getTo() == null) return;
         if (event.getFrom().getWorld() == null) return;
         if (event.getFrom().getWorld().equals(event.getTo().getWorld())) return;
