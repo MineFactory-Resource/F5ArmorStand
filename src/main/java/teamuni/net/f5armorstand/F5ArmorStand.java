@@ -1,9 +1,9 @@
 package teamuni.net.f5armorstand;
 
-
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Vector3f;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EnumItemSlot;
 import net.minecraft.world.entity.decoration.EntityArmorStand;
@@ -23,11 +23,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
-
-
 public final class F5ArmorStand extends JavaPlugin implements Listener {
     Map<UUID, EntityArmorStand> armorStands = new HashMap<>(); //아머스탠드 맵
-
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this); //이벤트 리스너 등록
@@ -49,7 +46,6 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
             }
         });
     }
-
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {//플레이어 접속시 아머스탠드를 만들고 업데이트함.
         Player player = event.getPlayer();
@@ -58,8 +54,6 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
             updateArmorStand(event.getPlayer());
         }
     }
-
-
     @EventHandler
     public void onChangeDimension(PlayerChangedWorldEvent event) {//차원(지옥문을 통해 네더 월드로 가거나, 엔드 차원문을 통해 엔드 월드를 가거나 등.) 이동시 아머스탠드를 만들고 업데이트를함.
         Player player = event.getPlayer();
@@ -68,7 +62,6 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
             updateArmorStand(event.getPlayer());
         }
     }
-
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
         if (!event.getPlayer().hasPermission("armorstand.noshow")) return;
@@ -80,7 +73,6 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
             updateArmorStand(event.getPlayer());
         });
     }
-
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -88,8 +80,6 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
             updateArmorStand(event.getPlayer()); //플레이어가 움직일때 아머스탠드 업데이트.
         }
     }
-
-
     private void createArmorStand(Player player) {
         EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle()); //새로운 아머스탠드 생성
         Entity armorStand2 = armorStand.getBukkitEntity();
@@ -110,7 +100,6 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
                 new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false) //메타데이터 업데이트 패킷 전송
         );
     }
-
     private void updateArmorStand(Player player) {
         EntityArmorStand armorStand = armorStands.get(player.getUniqueId());
         if (armorStand == null) return;
@@ -121,6 +110,9 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
         armorStand.a(new Vector3f(player.getLocation().getPitch(), 0, 0)); //아머스탠드 머리부분 벡터 설정
         ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
                 new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false) //메타데이터 업데이트 패킷 전송
+        );
+        ((CraftPlayer) player).getHandle().b.a(
+                new PacketPlayOutEntityHeadRotation(armorStand, (byte) MathHelper.d((loc.getYaw() * 256.0f)/ 360.0f))
         );
     }
 }
