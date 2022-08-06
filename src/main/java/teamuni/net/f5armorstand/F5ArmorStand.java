@@ -97,6 +97,7 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
         armorStand.a(loc.getX(), loc.getY(), loc.getZ()); //아머스탠드의 좌표 설정
         armorStand.j(true); //아머스탠드 투명하게 설정
         armorStand.t(true); //아머스탠드의 히트박스 제거
+        armorStand.a(true); //소형 아머스탠드로 설정
         armorStands.put(player.getUniqueId(), armorStand);
         ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
                 new PacketPlayOutSpawnEntity(armorStand) //아머스탠드 엔티티 스폰 패킷 전송
