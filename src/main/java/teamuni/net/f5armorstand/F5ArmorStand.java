@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -91,14 +92,22 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
 
     private void createArmorStand(Player player) {
         EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle()); //새로운 아머스탠드 생성
+        Entity armorStand2 = armorStand.getBukkitEntity();
         Location loc = player.getLocation();
-        armorStand.a(loc.getX(), loc.getY(), loc.getZ());
-        armorStand.j(true); //투명하게 설정
-        armorStand.t(true); //히트박스 제거
+        armorStand.a(loc.getX(), loc.getY(), loc.getZ()); //아머스탠드의 좌표 설정
+        armorStand.j(true); //아머스탠드 투명하게 설정
+        armorStand.t(true); //아머스탠드의 히트박스 제거
         armorStands.put(player.getUniqueId(), armorStand);
-        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutSpawnEntity(armorStand));
-        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityEquipment(armorStand.ae(), Collections.singletonList(new Pair<>(EnumItemSlot.f, Items.pC.P_()))));
-        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false));
+        ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
+                new PacketPlayOutSpawnEntity(armorStand) //아머스탠드 엔티티 스폰 패킷 전송
+        );
+        player.addPassenger(armorStand2);
+        ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
+                new PacketPlayOutEntityEquipment(armorStand.ae(), Collections.singletonList(new Pair<>(EnumItemSlot.f, Items.pC.P_()))) //아머스탠드 헤드에 가스트 눈물 장착 패킷 전송
+        );
+        ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
+                new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false) //메타데이터 업데이트 패킷 전송
+        );
     }
 
     private void updateArmorStand(Player player) {
@@ -108,8 +117,9 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
         armorStand.a(loc.getX(), loc.getY(), loc.getZ());
         armorStand.o(loc.getYaw());
         armorStand.p(loc.getPitch());
-        armorStand.a(new Vector3f(player.getLocation().getPitch(), 0, 0));
-        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false));
-        ((CraftPlayer) player).getHandle().b.a(new PacketPlayOutEntityTeleport(armorStand));
+        armorStand.a(new Vector3f(player.getLocation().getPitch(), 0, 0)); //아머스탠드 머리부분 벡터 설정
+        ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
+                new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false) //메타데이터 업데이트 패킷 전송
+        );
     }
 }
