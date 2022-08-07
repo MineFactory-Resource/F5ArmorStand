@@ -3,6 +3,7 @@ package teamuni.net.f5armorstand;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Vector3f;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EnumItemSlot;
@@ -82,36 +83,38 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
     }
     private void createArmorStand(Player player) {
         EntityArmorStand armorStand = new EntityArmorStand(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle()); //새로운 아머스탠드 생성
-        Entity armorStand2 = armorStand.getBukkitEntity();
+        EntityPlayer playerConnect = ((CraftPlayer) player).getHandle(); //변수 생성
+        Entity armorStand2 = armorStand.getBukkitEntity(); //NMS entity를 Bukkit entity로 변환
         Location loc = player.getLocation();
         armorStand.a(loc.getX(), loc.getY(), loc.getZ()); //아머스탠드의 좌표 설정
         armorStand.j(true); //아머스탠드 투명하게 설정
         armorStand.t(true); //아머스탠드의 히트박스 제거
         armorStand.a(true); //소형 아머스탠드로 설정
         armorStands.put(player.getUniqueId(), armorStand);
-        ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
+        playerConnect.b.a( //플레이어 네트워크 연결에
                 new PacketPlayOutSpawnEntity(armorStand) //아머스탠드 엔티티 스폰 패킷 전송
         );
         player.addPassenger(armorStand2);
-        ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
+        playerConnect.b.a( //플레이어 네트워크 연결에
                 new PacketPlayOutEntityEquipment(armorStand.ae(), Collections.singletonList(new Pair<>(EnumItemSlot.f, Items.pC.P_()))) //아머스탠드 헤드에 가스트 눈물 장착 패킷 전송
         );
-        ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
+        playerConnect.b.a( //플레이어 네트워크 연결에
                 new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false) //메타데이터 업데이트 패킷 전송
         );
     }
     private void updateArmorStand(Player player) {
         EntityArmorStand armorStand = armorStands.get(player.getUniqueId());
+        EntityPlayer playerConnect = ((CraftPlayer) player).getHandle(); //변수 생성
         if (armorStand == null) return;
         Location loc = player.getLocation();
         armorStand.a(loc.getX(), loc.getY(), loc.getZ());
         armorStand.o(loc.getYaw());
         armorStand.p(loc.getPitch());
         armorStand.a(new Vector3f(player.getLocation().getPitch(), 0, 0)); //아머스탠드 머리부분 벡터 설정
-        ((CraftPlayer) player).getHandle().b.a( //플레이어 네트워크 연결에
+        playerConnect.b.a( //플레이어 네트워크 연결에
                 new PacketPlayOutEntityMetadata(armorStand.ae(), armorStand.ai(), false) //메타데이터 업데이트 패킷 전송
         );
-        ((CraftPlayer) player).getHandle().b.a(
+        playerConnect.b.a(
                 new PacketPlayOutEntityHeadRotation(armorStand, (byte) MathHelper.d((loc.getYaw() * 256.0f)/ 360.0f))
         );
     }
