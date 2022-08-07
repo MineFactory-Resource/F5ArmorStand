@@ -51,34 +51,35 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
     public void onJoin(PlayerJoinEvent event) {//플레이어 접속시 아머스탠드를 만들고 업데이트함.
         Player player = event.getPlayer();
         if (!player.hasPermission("armorstand.noshow")) {
-            createArmorStand(event.getPlayer());
-            updateArmorStand(event.getPlayer());
+            createArmorStand(player);
+            updateArmorStand(player);
         }
     }
     @EventHandler
     public void onChangeDimension(PlayerChangedWorldEvent event) {//차원(지옥문을 통해 네더 월드로 가거나, 엔드 차원문을 통해 엔드 월드를 가거나 등.) 이동시 아머스탠드를 만들고 업데이트를함.
         Player player = event.getPlayer();
         if (!player.hasPermission("armorstand.noshow")) {
-            createArmorStand(event.getPlayer());
-            updateArmorStand(event.getPlayer());
+            createArmorStand(player);
+            updateArmorStand(player);
         }
     }
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
-        if (!event.getPlayer().hasPermission("armorstand.noshow")) return;
+        Player player = event.getPlayer();
+        if (!player.hasPermission("armorstand.noshow")) return;
         if (event.getTo() == null) return;
         if (event.getFrom().getWorld() == null) return;
         if (event.getFrom().getWorld().equals(event.getTo().getWorld())) return;
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-            createArmorStand(event.getPlayer());
-            updateArmorStand(event.getPlayer());
+            createArmorStand(player);
+            updateArmorStand(player);
         });
     }
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (!player.hasPermission("armorstand.noshow")) { //플레이어 이동시
-            updateArmorStand(event.getPlayer()); //플레이어가 움직일때 아머스탠드 업데이트.
+            updateArmorStand(player); //플레이어가 움직일때 아머스탠드 업데이트.
         }
     }
     private void createArmorStand(Player player) {
