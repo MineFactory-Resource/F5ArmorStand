@@ -66,13 +66,14 @@ public final class F5ArmorStand extends JavaPlugin implements Listener {
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
-        if (!player.hasPermission("armorstand.noshow")) return;
         if (event.getTo() == null) return;
         if (event.getFrom().getWorld() == null) return;
         if (event.getFrom().getWorld().equals(event.getTo().getWorld())) return;
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-            createArmorStand(player);
-            updateArmorStand(player);
+            if (!player.hasPermission("armorstand.noshow")) {
+                createArmorStand(player);
+                updateArmorStand(player);
+            }
         });
     }
     @EventHandler
